@@ -1,0 +1,81 @@
+name: Package SaaS App Auditor Skill
+run-name: Repackaging saas_app_auditor.zip for ${{ github.repository }}
+on:
+    pull_request:
+        types:
+            - closed
+        branches:
+            - main
+        paths:
+            - "saas_app_auditor/SKILL.md"
+            - "saas_app_auditor/scripts/**"
+            - "saas_app_auditor/references/**"
+            - "saas_app_auditor/assets/**"
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    package-skill:
+        if: github.event.pull_request.merged == true
+        runs-on: ubuntu-latest
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            BOT_BRANCH: bot/repackage-saas-app-auditor-zip
+        steps:
+            # main requires PRs for all changes (branch protection), so this job
+            # can't push straight to main. It pushes to a reusable bot branch
+            # instead and opens/updates a PR with auto-merge enabled, so it still
+            # merges on its own once required checks/reviews are satisfied.
+            - name: Checkout main
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+
+            # Mirrors the same include list as local packaging: SKILL.md plus the
+            # scripts, references, and assets folders. README.md and any other
+            # top-level file are intentionally left out of the skill zip.
+            - name: Rebuild skill zip
+              working-directory: saas_app_auditor
+              run: |
+                  rm -f saas_app_auditor.zip
+                  zip -r saas_app_auditor.zip \
+                      SKILL.md \
+                      scripts \
+                      references \
+                      assets \
+                      -x "*/__pycache__/*" "*.pyc"
+
+            - name: Open or update bot PR with the rebuilt zip
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add saas_app_auditor/saas_app_auditor.zip
+
+                  if git diff --cached --quiet; then
+                      echo "saas_app_auditor.zip already up to date. Nothing to do."
+                      exit 0
+                  fi
+
+                  git checkout -B "$BOT_BRANCH"
+                  git commit -m "Repackage saas_app_auditor skill zip"
+                  git push --force origin "$BOT_BRANCH"
+
+                  PR_STATE=$(gh pr view "$BOT_BRANCH" --json state --jq .state 2>/dev/null || echo "NONE")
+                  if [ "$PR_STATE" = "OPEN" ]; then
+                      echo "Bot PR already open on $BOT_BRANCH; branch updated with the new zip."
+                      exit 0
+                  fi
+
+                  gh pr create \
+                      --base main \
+                      --head "$BOT_BRANCH" \
+                      --title "Repackage saas_app_auditor skill zip" \
+                      --body "Automated repackage of saas_app_auditor.zip, triggered by #${{ github.event.pull_request.number }}. Will merge automatically once required checks/reviews pass."
+
+                  # Requires "Allow auto-merge" enabled under Settings > General >
+                  # Pull Requests. If it isn't, this warns instead of failing the
+                  # run — the PR still exists and just needs a manual merge.
+                  gh pr merge "$BOT_BRANCH" --auto --squash || \
+                      echo "::warning::Could not enable auto-merge on the bot PR. Enable 'Allow auto-merge' in repo settings, or merge $BOT_BRANCH into main manually."

@@ -1,0 +1,6 @@
+version: 2                            # Version must be 2 or higher
+updates:
+- package-ecosystem: "github-actions"
+  directory: "/"                      # This value will automatically search for the .github directory.
+  schedule:
+    interval: "weekly"                # Possible values: daily, weekly, monthly
