@@ -29,7 +29,7 @@ jobs:
             # instead and opens/updates a PR with auto-merge enabled, so it still
             # merges on its own once required checks/reviews are satisfied.
             - name: Checkout main
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   ref: main
 
