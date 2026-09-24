@@ -1,0 +1,23 @@
+{
+  "app_name": "Example SaaS App",
+  "rows": [
+    {
+      "mitre_category": "Persistence (T1550.001: Use Alternate Authentication Material - Application Access Token)",
+      "severity": "High",
+      "question": "Can users install third-party OAuth apps from the marketplace without admin approval, and if so, has anyone reviewed what's currently connected?",
+      "description": "Self-service OAuth consent is one of the most common SaaS breach vectors — an attacker sends a phishing link that requests broad read/export scopes on a malicious app, the user approves it, and the attacker now has persistent API access that survives password resets and MFA. Ask to see the current list of connected apps and their granted scopes."
+    },
+    {
+      "mitre_category": "Persistence (T1556.006: Modify Authentication Process - Multi-Factor Authentication)",
+      "severity": "Critical",
+      "question": "Is MFA enforced for every account, including admins and any legacy/local-auth accounts that bypass SSO?",
+      "description": "Accounts excluded from MFA enforcement (service accounts, break-glass accounts, accounts predating an SSO rollout) are the accounts attackers find first. Ask specifically about exceptions, not just the general policy."
+    },
+    {
+      "mitre_category": "Defense Evasion (T1562.008: Impair Defenses - Disable or Modify Cloud Logs)",
+      "severity": "Medium",
+      "question": "Who can disable or reduce audit logging, and would your team notice if that happened?",
+      "description": "If an admin-level attacker can silently disable audit logging, every other control in this questionnaire becomes unverifiable after the fact. This question tests both the technical control and the detection/alerting around it."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+name: TruffleHog Secret Detection Caller
+run-name: TruffleHog is scanning ${{ github.repository }} for secrets
+on:
+    push:
+        branches-ignore:
+            - master
+            - main
+    pull_request:
+jobs:
+    call-trufflehog-scan:
+        uses: el-axolotl/github-workflow-demos/.github/workflows/trufflehog.yml@main
+        

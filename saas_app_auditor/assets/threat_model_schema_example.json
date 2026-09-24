@@ -1,0 +1,29 @@
+{
+  "app_name": "Example SaaS App",
+  "rows": [
+    {
+      "stride_category": "Spoofing",
+      "system_component": "Authentication / SSO",
+      "threat": "An attacker uses a stolen or guessed password to log in as a legitimate user, because local email/password login remains available alongside SSO and isn't covered by MFA.",
+      "current_mitigation": "SSO is enforced for the main application, but three legacy service accounts still use local password auth with no MFA (per admin interview).",
+      "mitigation_status": "Partially Mitigated",
+      "linked_tickets": ""
+    },
+    {
+      "stride_category": "Repudiation",
+      "system_component": "Audit Logging",
+      "threat": "An admin-level attacker disables audit log export to the SIEM, allowing their subsequent actions to go undetected and unattributed.",
+      "current_mitigation": "Audit logs are exported to Splunk via the vendor's native integration; no alert currently fires if the export stops (per admin interview).",
+      "mitigation_status": "Partially Mitigated",
+      "linked_tickets": ""
+    },
+    {
+      "stride_category": "Elevation of Privilege",
+      "system_component": "Role & Permission Management",
+      "threat": "A compromised standard-user account is granted admin-level permissions by another compromised or malicious admin account, with no second approval required.",
+      "current_mitigation": "No approval workflow exists for permission or role changes; any admin can unilaterally grant roles (per admin interview).",
+      "mitigation_status": "Not Mitigated",
+      "linked_tickets": ""
+    }
+  ]
+}
